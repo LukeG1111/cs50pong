@@ -32,6 +32,8 @@ function love.load()
     -- player_two_y = VIRTUAL_HEIGHT - 30
     player_two = Paddle(VIRTUAL_WIDTH - 15, VIRTUAL_HEIGHT - 30, 'up', 'down')
 
+    serving_player = 1
+
     -- ball_dx = math.random(2) == 1 and 100 or -100
     -- ball_dy = math.random(-50, 50)
 
@@ -52,16 +54,26 @@ function love.keypressed(key)
         love.event.quit()
     elseif key == 'enter' or key == 'return' then
         if game_state == 'start' then
+            game_state = 'serve'
+        elseif game_state == 'serve' then
+            -- if serving_player == 1 then
+            --     ball.dx = math.random(2) == 1 and 100
+            -- elseif serving_player == 2 then
+            --     ball.dx = math.random(2) == 1 and -100
+            -- end
             game_state = 'play'
-        else
-            game_state = 'start'
-
-            -- ball_x = VIRTUAL_WIDTH / 2 - 2
-            -- ball_y = VIRTUAL_HEIGHT / 2 - 2
-
-            -- ball_dx = math.random(2) == 1 and 100 or -100
-            -- ball_dy = math.random(-50, 50) * 1.5
+        elseif game_state == 'done' then
+            game_state = 'serve'
             ball:reset()
+
+            player_one_score = 0
+            player_two_score = 0
+
+            if winning_player == 1 then
+                serving_player = 2
+            else
+                serving_player = 1
+            end
         end
     end
 end
@@ -102,20 +114,31 @@ function love.update(dt)
     end
 
     if ball.x < 0 then
-        serving_player = 1
+        serving_player = 2
         player_two_score = player_two_score + 1
+        
         ball:reset()
-        game_state = 'start'
+        game_state = 'serve'
     end
 
     if ball.x > VIRTUAL_WIDTH then
-        serving_player = 2
+        serving_player = 1
         player_one_score = player_one_score + 1
         ball:reset()
-        game_state = 'start'
+        game_state = 'serve'
     end
 
+    if player_one_score == 3 then
+        winning_player = 1
+        game_state = 'done'
 
+    end
+
+    if player_two_score == 3 then
+        winning_player = 2
+        game_state = 'done'
+
+    end
 
     -- if love.keyboard.isDown('w') then
     --     -- player_one_y = player_one_y + -PADDLE_SPEED * dt
@@ -143,11 +166,25 @@ end
 function love.draw()
     push:start()
     love.graphics.clear(40/255, 45/255, 52/255, 1)
-    love.graphics.setFont(debreosee_sm)
-    love.graphics.printf("Hello Pong", 0, VIRTUAL_HEIGHT / 2 - 120, VIRTUAL_WIDTH, 'center')
-    love.graphics.setFont(monas)
-    love.graphics.print(tostring(player_one_score), VIRTUAL_WIDTH / 2 - 50, VIRTUAL_HEIGHT / 2 - 110)
-    love.graphics.print(tostring(player_two_score), VIRTUAL_WIDTH / 2 + 30, VIRTUAL_HEIGHT / 2 - 110)
+
+    if game_state == 'start' then
+        love.graphics.setFont(debreosee)
+        love.graphics.printf("Welcome to Pong!", 0, VIRTUAL_HEIGHT / 2 - 120, VIRTUAL_WIDTH, 'center')
+        love.graphics.setFont(debreosee_sm)
+        love.graphics.printf("Press enter to begin...", 0, VIRTUAL_HEIGHT / 2 - 90, VIRTUAL_WIDTH, 'center')
+    elseif game_state == 'serve' then
+        love.graphics.setFont(monas)
+        love.graphics.printf('Player ' .. tostring(serving_player) .. "'s serve!", 0, VIRTUAL_HEIGHT / 2 - 130, VIRTUAL_WIDTH, 'center')
+        love.graphics.printf("Press enter to serve!", 0, VIRTUAL_HEIGHT / 2 - 50, VIRTUAL_WIDTH, 'center')
+    elseif game_state == 'play' then
+        love.graphics.setFont(monas)
+        love.graphics.print(tostring(player_one_score), VIRTUAL_WIDTH / 2 - 50, VIRTUAL_HEIGHT / 2 - 110)
+        love.graphics.print(tostring(player_two_score), VIRTUAL_WIDTH / 2 + 30, VIRTUAL_HEIGHT / 2 - 110)
+    elseif game_state == 'done' then
+        love.graphics.setFont(monas)
+        love.graphics.printf('Player ' .. tostring(winning_player) .. ' wins!', 0, VIRTUAL_HEIGHT / 2 - 130, VIRTUAL_WIDTH, 'center')
+    end
+
 
     -- paddle 1
     -- love.graphics.rectangle('fill', 10, player_one_y, 5, 20)
