@@ -10,6 +10,7 @@ push = require 'push/push'
 Class = require 'hump/class'
 
 require 'Ball'
+require 'Paddle'
 
 function love.load()
 
@@ -24,8 +25,10 @@ function love.load()
     player_one_score = 0
     player_two_score = 0
 
-    player_one_y = 10
-    player_two_y = VIRTUAL_HEIGHT - 30
+    -- player_one_y = 10
+    player_one = Paddle(10,10, 'w', 's')
+    -- player_two_y = VIRTUAL_HEIGHT - 30
+    player_two = Paddle(VIRTUAL_WIDTH - 15, VIRTUAL_HEIGHT - 30, 'up', 'down')
 
     -- ball_dx = math.random(2) == 1 and 100 or -100
     -- ball_dy = math.random(-50, 50)
@@ -62,22 +65,22 @@ function love.keypressed(key)
 end
 
 function love.update(dt)
-    if love.keyboard.isDown('w') then
-        -- player_one_y = player_one_y + -PADDLE_SPEED * dt
-        player_one_y = math.max(0, player_one_y + -PADDLE_SPEED * dt)
-    elseif love.keyboard.isDown('s') then
-        -- player_one_y = player_one_y + PADDLE_SPEED * dt
-        player_one_y = math.min(VIRTUAL_HEIGHT - 20, player_one_y + PADDLE_SPEED * dt)
-    end
-
-    if love.keyboard.isDown('up') then
-        -- player_two_y = player_two_y + -PADDLE_SPEED * dt
-        player_two_y = math.max(0, player_two_y + -PADDLE_SPEED * dt)
-    elseif love.keyboard.isDown('down') then
-        -- player_two_y = player_two_y + PADDLE_SPEED * dt
-        player_two_y = math.min(VIRTUAL_HEIGHT - 20, player_two_y + PADDLE_SPEED * dt)
-    end
-
+    -- if love.keyboard.isDown('w') then
+    --     -- player_one_y = player_one_y + -PADDLE_SPEED * dt
+    --     player_one_y = math.max(0, player_one_y + -PADDLE_SPEED * dt)
+    -- elseif love.keyboard.isDown('s') then
+    --     -- player_one_y = player_one_y + PADDLE_SPEED * dt
+    --     player_one_y = math.min(VIRTUAL_HEIGHT - 20, player_one_y + PADDLE_SPEED * dt)
+    -- end
+    player_one:update(PADDLE_SPEED, dt)
+    -- if love.keyboard.isDown('up') then
+    --     -- player_two_y = player_two_y + -PADDLE_SPEED * dt
+    --     player_two_y = math.max(0, player_two_y + -PADDLE_SPEED * dt)
+    -- elseif love.keyboard.isDown('down') then
+    --     -- player_two_y = player_two_y + PADDLE_SPEED * dt
+    --     player_two_y = math.min(VIRTUAL_HEIGHT - 20, player_two_y + PADDLE_SPEED * dt)
+    -- end
+    player_two:update(PADDLE_SPEED, dt)
     if game_state == 'play' then
         -- ball_x = ball_x + ball_dx * dt
         -- ball_y = ball_y + ball_dy * dt
@@ -95,12 +98,12 @@ function love.draw()
     love.graphics.print(tostring(player_two_score), VIRTUAL_WIDTH / 2 + 30, VIRTUAL_HEIGHT / 2 - 110)
 
     -- paddle 1
-    love.graphics.rectangle('fill', 10, player_one_y, 5, 20)
-
+    -- love.graphics.rectangle('fill', 10, player_one_y, 5, 20)
+    player_one:render()
     -- paddle 2
-    love.graphics.rectangle('fill', VIRTUAL_WIDTH - 15, player_two_y, 5, 20)
+    -- love.graphics.rectangle('fill', VIRTUAL_WIDTH - 15, player_two_y, 5, 20)
+    player_two:render()
 
-    -- ball
     -- love.graphics.rectangle('fill', ball_x, ball_y, 4, 4)
     ball:render()
     push:finish()
