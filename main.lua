@@ -15,9 +15,11 @@ require 'Paddle'
 function love.load()
 
     love.graphics.setDefaultFilter('nearest', 'nearest')
+    love.window.setTitle('Pong')
 
     math.randomseed(os.time())
 
+    console_font = love.graphics.newFont((8))
     debreosee = love.graphics.newFont('Debrosee-ALPnL.ttf', 32)
     debreosee_sm = love.graphics.newFont('Debrosee-ALPnL.ttf', 8)
     monas = love.graphics.newFont('Monas-BLBW8.ttf', 32)
@@ -65,6 +67,56 @@ function love.keypressed(key)
 end
 
 function love.update(dt)
+    if game_state == 'play' then
+        if ball:collides(player_one) then
+            ball.dx = -ball.dx * 1.03
+            ball.x = player_one.x + 5
+
+            -- randomize velocity
+            if ball.dy < 0 then
+                ball.dy = -math.random(10, 150)
+            else
+                ball.dy = math.random(10, 150)
+            end
+        end
+        if ball:collides(player_two) then
+            ball.dx = -ball.dx * 1.03
+            ball.x = player_two.x - 4
+
+            if ball.dy < 0 then
+                ball.dy = -math.random(10, 150)
+            else
+                ball.dy = math.random(10, 150)
+            end
+        end
+
+        if ball.y <= 0 then
+            ball.y = 0
+            ball.dy = -ball.dy
+        end
+
+        if ball.y >= VIRTUAL_HEIGHT - 4 then
+            ball.y = VIRTUAL_HEIGHT - 4
+            ball.dy = -ball.dy
+        end
+    end
+
+    if ball.x < 0 then
+        serving_player = 1
+        player_two_score = player_two_score + 1
+        ball:reset()
+        game_state = 'start'
+    end
+
+    if ball.x > VIRTUAL_WIDTH then
+        serving_player = 2
+        player_one_score = player_one_score + 1
+        ball:reset()
+        game_state = 'start'
+    end
+
+
+
     -- if love.keyboard.isDown('w') then
     --     -- player_one_y = player_one_y + -PADDLE_SPEED * dt
     --     player_one_y = math.max(0, player_one_y + -PADDLE_SPEED * dt)
@@ -94,7 +146,7 @@ function love.draw()
     love.graphics.setFont(debreosee_sm)
     love.graphics.printf("Hello Pong", 0, VIRTUAL_HEIGHT / 2 - 120, VIRTUAL_WIDTH, 'center')
     love.graphics.setFont(monas)
-    love.graphics.print("0", VIRTUAL_WIDTH / 2 - 50, VIRTUAL_HEIGHT / 2 - 110)
+    love.graphics.print(tostring(player_one_score), VIRTUAL_WIDTH / 2 - 50, VIRTUAL_HEIGHT / 2 - 110)
     love.graphics.print(tostring(player_two_score), VIRTUAL_WIDTH / 2 + 30, VIRTUAL_HEIGHT / 2 - 110)
 
     -- paddle 1
@@ -106,5 +158,14 @@ function love.draw()
 
     -- love.graphics.rectangle('fill', ball_x, ball_y, 4, 4)
     ball:render()
+
+    display_fps()
     push:finish()
+end
+
+function display_fps()
+    love.graphics.setFont(console_font)
+    love.graphics.setColor(0, 255/255, 0, 255/255)
+    love.graphics.print('FPS: ' .. tostring(love.timer.getFPS()), 10, 10)
+    love.graphics.setColor(1, 1, 1, 1)
 end
