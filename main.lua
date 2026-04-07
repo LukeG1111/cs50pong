@@ -27,20 +27,13 @@ function love.load()
     player_one_score = 0
     player_two_score = 0
 
-    -- player_one_y = 10
     player_one = Paddle(10,10, 'w', 's')
-    -- player_two_y = VIRTUAL_HEIGHT - 30
+
     player_two = Paddle(VIRTUAL_WIDTH - 15, VIRTUAL_HEIGHT - 30, 'up', 'down')
 
-    serving_player = 1
+    serving_player = 2
 
-    -- ball_dx = math.random(2) == 1 and 100 or -100
-    -- ball_dy = math.random(-50, 50)
-
-    -- ball_x = VIRTUAL_WIDTH / 2 - 2
-    -- ball_y = VIRTUAL_HEIGHT / 2 - 2
-
-    ball = Ball(VIRTUAL_WIDTH / 2 - 2, VIRTUAL_HEIGHT / 2 - 2, 4, 4)
+    ball = Ball(VIRTUAL_WIDTH / 2 - 2, VIRTUAL_HEIGHT / 2 - 2, 4, 4, true)
 
     game_state = 'start'
 
@@ -69,11 +62,11 @@ function love.keypressed(key)
             player_one_score = 0
             player_two_score = 0
 
-            if winning_player == 1 then
-                serving_player = 2
-            else
-                serving_player = 1
-            end
+            -- if winning_player == 1 then
+            --     serving_player = 2
+            -- else
+            --     serving_player = 1
+            -- end
         end
     end
 end
@@ -116,7 +109,7 @@ function love.update(dt)
     if ball.x < 0 then
         serving_player = 2
         player_two_score = player_two_score + 1
-        
+        ball.left = true
         ball:reset()
         game_state = 'serve'
     end
@@ -124,6 +117,7 @@ function love.update(dt)
     if ball.x > VIRTUAL_WIDTH then
         serving_player = 1
         player_one_score = player_one_score + 1
+        ball.left = false
         ball:reset()
         game_state = 'serve'
     end
@@ -140,22 +134,20 @@ function love.update(dt)
 
     end
 
-    -- if love.keyboard.isDown('w') then
-    --     -- player_one_y = player_one_y + -PADDLE_SPEED * dt
-    --     player_one_y = math.max(0, player_one_y + -PADDLE_SPEED * dt)
-    -- elseif love.keyboard.isDown('s') then
-    --     -- player_one_y = player_one_y + PADDLE_SPEED * dt
-    --     player_one_y = math.min(VIRTUAL_HEIGHT - 20, player_one_y + PADDLE_SPEED * dt)
-    -- end
     player_one:update(PADDLE_SPEED, dt)
-    -- if love.keyboard.isDown('up') then
-    --     -- player_two_y = player_two_y + -PADDLE_SPEED * dt
-    --     player_two_y = math.max(0, player_two_y + -PADDLE_SPEED * dt)
-    -- elseif love.keyboard.isDown('down') then
-    --     -- player_two_y = player_two_y + PADDLE_SPEED * dt
-    --     player_two_y = math.min(VIRTUAL_HEIGHT - 20, player_two_y + PADDLE_SPEED * dt)
-    -- end
+
+
     player_two:update(PADDLE_SPEED, dt)
+
+    
+    -- if serving_player == 1 then
+
+    --     ball.dx = -ball.dx
+    -- -- elseif serving_player == 2 then
+
+    -- end
+    
+
     if game_state == 'play' then
         -- ball_x = ball_x + ball_dx * dt
         -- ball_y = ball_y + ball_dy * dt

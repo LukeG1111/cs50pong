@@ -1,10 +1,11 @@
 Ball = Class{}
 
-function Ball:init(x, y, width, height)
+function Ball:init(x, y, width, height, left)
     self.x = x
     self.y = y
     self.width = width
     self.height = height
+    self.left = left
 
     self.dx = math.random(2) == 1 and 100 or -100
     self.dy = math.random(-50, 50)
@@ -22,7 +23,12 @@ end
 function Ball:reset()
     self.x = VIRTUAL_WIDTH / 2 - 2
     self.y = VIRTUAL_HEIGHT / 2 - 2
-    self.dx = math.random(2) == 1 and 100 or -100
+    -- self.dx = math.random(2) == 1 and 100 or -100
+    if self.left == false then
+        self.dx = 100
+    else
+        self.dx = -100
+    end
     self.dy = math.random(-50, 50)
 end
 
